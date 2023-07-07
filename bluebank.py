@@ -2,33 +2,39 @@
 """
 Created on Sun May  1 11:58:02 2022
 
-@author: Michael
+@author: Michael Romero
 """
 import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+#read json data Method 1
 json_file = open('loan_data_json.json')
 data = json.load(json_file)
 
+#read json data Method2
 with open('loan_data_json.json') as json_file:
     data = json.load(json_file)
 
+#Transform to dataframe
 loandata = pd.DataFrame(data)
 
+#Find unique values for purpose column
 loandata['purpose'].unique()
 
+#Describe data structures details
 loandata.describe()
-
 loandata['dti'].describe()
 
+#EXP() to get Annual Income
 income = np.exp(loandata['log.annual.inc'])
-
 loandata['annualincome'] = income
 
 length = len(loandata)
 ficocat = []
+
+#FICO Score Calculations
 for x in range(0,length):
     category = loandata['fico'][x]
     try:
@@ -58,6 +64,8 @@ loandata.loc[loandata['int.rate'] > 0.12, 'int.rate.type'] = 'High'
 loandata.loc[loandata['int.rate'] <= 0.12, 'int.rate.type'] = 'Low'   
 
 
+
+#test calculation with visual graphing
 catplot = loandata.groupby(['fico.category']).size()
 
 purposecount = loandata.groupby(['purpose']).size()
@@ -75,4 +83,5 @@ plt.scatter(xpoint, ypoint, color = 'green')
 plt.show
 
 
+#Output Results to csv file to be used in dashboard calculations
 loandata.to_csv('loan_cleaned.csv', index = True)
